@@ -25,7 +25,9 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 config :ethereumex,
-  client_type: :ipc,
+  # client_type: :ipc,
+  # client_type: :http,
+  client_type: :ws,
   url: "http://localhost:8545",
   ipc_path:
     System.get_env(
