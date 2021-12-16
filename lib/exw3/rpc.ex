@@ -90,8 +90,8 @@ defmodule ExW3.Rpc do
 
   @type log_filter :: %{
           optional(:address) => String.t(),
-          optional(:fromBlock) => hex_block_number | latest | earliest | pending,
-          optional(:toBlock) => hex_block_number | latest | earliest | pending,
+          optional(:fromBlock) => hex_block_number | latest | earliest | pending | number(),
+          optional(:toBlock) => hex_block_number | latest | earliest | pending | number(),
           optional(:topics) => [String.t()],
           optional(:blockhash) => String.t()
         }
