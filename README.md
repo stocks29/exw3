@@ -1,3 +1,9 @@
+# This Fork
+
+This is a fork of the ExW3 project which implements a websocket transport. It is still a work in progress and requires some polish and tests to productionalize. Use at your own risk.
+
+This work was sponsored by [Hawku](https://www.hawku.com/).
+
 # ExW3
 
 [![Build Status](https://github.com/hswick/exw3/workflows/test/badge.svg?branch=master)](https://github.com/hswick/exw3/actions?query=workflow%3Atest)
