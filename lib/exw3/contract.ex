@@ -73,6 +73,15 @@ defmodule ExW3.Contract do
     )
   end
 
+  @doc "Using saved information related to the filter id, event logs are formatted properly"
+  @spec get_filter_logs(binary()) :: {:ok, list()}
+  def get_filter_logs(filter_id) do
+    GenServer.call(
+      ContractManager,
+      {:get_filter_logs, filter_id}
+    )
+  end
+
   def init(state) do
     {:ok, state}
   end
@@ -406,34 +415,15 @@ defmodule ExW3.Contract do
 
   def handle_call({:get_filter_changes, filter_id}, _from, state) do
     filter_info = Map.get(state[:filters], filter_id)
-
-    event_attributes =
-      get_event_attributes(state, filter_info[:contract_name], filter_info[:event_name])
-
     logs = ExW3.Rpc.get_filter_changes(filter_id)
+    formatted_logs = format_logs(logs, filter_info, state)
+    {:reply, {:ok, formatted_logs}, state}
+  end
 
-    formatted_logs =
-      if logs != [] do
-        Enum.map(logs, fn log ->
-          formatted_log =
-            Enum.reduce(
-              [
-                ExW3.Normalize.transform_to_integer(log, [
-                  "blockNumber",
-                  "logIndex",
-                  "transactionIndex"
-                ]),
-                format_log_data(log, event_attributes)
-              ],
-              &Map.merge/2
-            )
-
-          formatted_log
-        end)
-      else
-        logs
-      end
-
+  def handle_call({:get_filter_logs, filter_id}, _from, state) do
+    filter_info = Map.get(state[:filters], filter_id)
+    logs = ExW3.Rpc.get_filter_logs(filter_id)
+    formatted_logs = format_logs(logs, filter_info, state)
     {:reply, {:ok, formatted_logs}, state}
   end
 
@@ -534,5 +524,31 @@ defmodule ExW3.Contract do
       end)
 
     {:reply, {:ok, {receipt, formatted_logs}}, state}
+  end
+
+  defp format_logs(logs, filter_info, state) do
+    event_attributes =
+      get_event_attributes(state, filter_info[:contract_name], filter_info[:event_name])
+
+    if logs != [] do
+      Enum.map(logs, fn log ->
+        formatted_log =
+          Enum.reduce(
+            [
+              ExW3.Normalize.transform_to_integer(log, [
+                "blockNumber",
+                "logIndex",
+                "transactionIndex"
+              ]),
+              format_log_data(log, event_attributes)
+            ],
+            &Map.merge/2
+          )
+
+        formatted_log
+      end)
+    else
+      logs
+    end
   end
 end

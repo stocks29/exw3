@@ -88,6 +88,14 @@ defmodule ExW3.Rpc do
     end
   end
 
+  @spec get_filter_logs(binary()) :: any()
+  def get_filter_logs(filter_id) do
+    case call_client(:eth_get_filter_logs, [filter_id]) do
+      {:ok, changes} -> changes
+      err -> err
+    end
+  end
+
   @type log_filter :: %{
           optional(:address) => String.t(),
           optional(:fromBlock) => hex_block_number | latest | earliest | pending,
